@@ -35,7 +35,7 @@ import csv
 
 def train(numIter, eta, inputFile):
     with open(inputFile,'r') as tsv:
-        lines = [line.strip().split('\t') for line in tsv]
+        lines = [line.strip().split(',') for line in tsv]
     label = list()
     data = list()
     for line in lines:
@@ -59,7 +59,7 @@ def train(numIter, eta, inputFile):
 
 def test(weight, inputFile):
     with open(inputFile,'r') as tsv:
-        lines = [line.strip().split('\t') for line in tsv]
+        lines = [line.strip().split(',') for line in tsv]
     label = list()
     data = list()
     for line in lines:
@@ -81,10 +81,11 @@ def test(weight, inputFile):
         errors.append(total_error*(-1))
 
     return errors
-    
+
 
 def main():
-
+    weights = train(50, 1, "hw1.txt")
+    errors = test(1, "hw1.txt")
 
 if __name__ == "__main__":
     main()
