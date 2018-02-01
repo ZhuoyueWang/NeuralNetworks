@@ -97,6 +97,8 @@ def test(weight, inputFile, first, second):
     plt.plot(errors)
     plt.xlabel('Epoch')
     plt.ylabel('Total Loss')
+    plt.savefig('foo.png')
+
 
     return errors
 
