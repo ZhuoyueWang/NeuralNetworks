@@ -35,23 +35,35 @@ import csv
 
 def train(numIter, eta, inputFile):
     with open(inputFile,'r') as tsv:
-        lines = [line.strip().split(',') for line in tsv]
+        lines = [line.split(',') for line in tsv]
     label = list()
     data = list()
+    versiFlag = 0
     for line in lines:
         length = len(line)
-        label.append(line[length-1])
-        temp = [line[i] for i in range(length)]
-        data.append(temp)
+        if line[length-1] == 'Iris-setosa':
+            label.append(1)
+            versiFlag = 1
+        elif line[length-1] == 'Iris-versicolor':
+            if versiFlag == 0: #versicolor is the first -> 1
+                label.append(1)
+            else:
+                label.append(-1) # the second is versilvollor
+        else:
+            label.append(-1)
+
+        temp = [float(line[i]) for i in range(length-1)]
+        data.append(np.array(temp))
 
     label = np.array(label)
     data = np.array(data)
     weight = np.zeros(len(data[0]))
 
+
     for perIter in range(numIter):
-        for i, x in enumerate(data):
-            if np.dot(data[i],weight)*label(i) <= 0:
-                weight = weight + eta*data[i]*label[i]
+        for i,x in enumerate(data):
+            if data[i].dot(weight)*label[i] <= 0:
+                weight += eta*data[i]*label[i]
         print("current weight is {}\n".format(weight))
 
     return weight
@@ -62,30 +74,53 @@ def test(weight, inputFile):
         lines = [line.strip().split(',') for line in tsv]
     label = list()
     data = list()
+    versiFlag = 0
     for line in lines:
         length = len(line)
-        label.append(line[length-1])
-        temp = [line[i] for i in range(length)]
-        data.append(temp)
+        if line[length-1] == 'Iris-setosa':
+            label.append(1)
+            versiFlag = 1
+        elif line[length-1] == 'Iris-versicolor':
+            if versiFlag == 0: #versicolor is the first -> 1
+                label.append(1)
+            else:
+                label.append(-1) # the second is versilvollor
+        else:
+            label.append(-1)
+        temp = [float(line[i]) for i in range(length-1)]
+        data.append(np.array(temp))
 
     eta = 1
     numIter = 30
     errors = []
 
-    for perIter in numIter:
+    for perIter in range(numIter):
         total_error = 0
         for i, x in enumerate(data):
             if np.dot(data[i],weight)*label[i] <= 0:
                 total_error = total_error + np.dot(data[i],weight)*label[i]
-                weight = weight + eta*data[i]*label[i]
+                weight += eta*data[i]*label[i]
         errors.append(total_error*(-1))
 
     return errors
 
 
 def main():
-    weights = train(50, 1, "hw1.txt")
-    errors = test(1, "hw1.txt")
+    weight1 = train(50, 1, "setosa-versicolor.txt")
+    error1 = test([1,1,1,1], "setosa-versicolor.txt")
+
+#    weight2 = train(50, 1, "versicolor-virginica.txt")
+#    error2 = test([1,1,1,1], "versicolor-virginica.txt")
+
+#    weight3 = train(50, 1, "setosa-virginica.txt")
+#    error3 = test([1,1,1,1],"setosa-virginica.txt")
+
+
 
 if __name__ == "__main__":
     main()
+
+
+#setosa-versicolor: setosa -> 1      versicolor -> -1
+#versicolor-virginica   versicolor -> 1  virginica -> -1
+#setosa-virginica: setosa -> 1  virginica -> -1
